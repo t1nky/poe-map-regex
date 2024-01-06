@@ -175,9 +175,9 @@ import mods from "../data/mods.json";
     }
 
     const lowerSubsetArray = subsetArray.map((s) =>
-      s.toLowerCase().replace("|", "\n")
+      s.toLowerCase().replaceAll("|", "\n")
     );
-    const lowerFullArray = mods.map((s) => s.toLowerCase().replace("|", "\n"));
+    const lowerFullArray = mods.map((s) => s.toLowerCase().replaceAll("|", "\n"));
 
     const lowerSubsetSet = new Set(lowerSubsetArray);
     const lowerOtherStringsCommonSet = generateCommonSubstringsSet(
