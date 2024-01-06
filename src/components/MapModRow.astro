@@ -6,7 +6,7 @@ const { item, onRowClick } = Astro.props;
   id="map-mod-row"
   class="flex cursor-pointer items-center p-2 duration-0 hover:bg-black/10 data-[selected=true]:bg-green-700 dark:hover:bg-white/10 dark:data-[selected=true]:bg-green-950"
   onclick={onRowClick}
-  data-value={item.replace(/\|/g, "<br>")}
+  data-value={item}
 >
   <div
     class="ml-3 text-sm text-gray-700 dark:text-gray-100 font-medium"

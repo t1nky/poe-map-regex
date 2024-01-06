@@ -50,9 +50,16 @@ import mods from "../data/mods.json";
         >Length: 0/50</small
       >
 
-      <h2 class="text-xl font-bold text-gray-700 mt-4 mb-4 dark:text-gray-100">
-        Select mods:
-      </h2>
+      <div class="flex justify-between items-center mt-4 mb-4">
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-100">
+          Select mods:
+        </h2>
+        <button
+          id="resetButton"
+          class="duration-100 text-sm border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded px-3 py-0.5"
+          >Reset</button
+        >
+      </div>
       <input
         type="search"
         id="regexFilter"
@@ -75,6 +82,7 @@ import mods from "../data/mods.json";
     findCommonSubstrings,
     findCoveringGroups,
     mapSubstringsToMatches,
+    generateCommonSubstringsSet,
   } from "../utils/regex";
   import mods from "../data/mods.json";
   import mapNames from "../data/map-names.json";
@@ -109,6 +117,19 @@ import mods from "../data/mods.json";
 
   const regexFilterInput = document.getElementById("regexFilter");
   const itemList = document.getElementById("itemList");
+
+  function resetSelections() {
+    subsetArray.length = 0;
+    const buttons = document.querySelectorAll("#map-mod-row");
+    buttons.forEach((button) => {
+      button.setAttribute("data-selected", "false");
+    });
+    updateURL();
+    updateRegex();
+  }
+  document.getElementById("resetButton")?.addEventListener("click", () => {
+    resetSelections();
+  });
 
   function filterItems() {
     if (!regexFilterInput || !itemList) {
@@ -153,12 +174,26 @@ import mods from "../data/mods.json";
       return;
     }
 
-    const commonSubstrings = findCommonSubstrings(subsetArray, mods, mapNames);
-    const lowerSubsetArray = subsetArray.map((s) => s.toLowerCase());
+    const lowerSubsetArray = subsetArray.map((s) =>
+      s.toLowerCase().replace("|", "\n")
+    );
+    const lowerFullArray = mods.map((s) => s.toLowerCase().replace("|", "\n"));
+
+    const lowerSubsetSet = new Set(lowerSubsetArray);
+    const lowerOtherStringsCommonSet = generateCommonSubstringsSet(
+      lowerFullArray.filter((item) => !lowerSubsetSet.has(item)),
+      2,
+      18
+    );
+
+    const commonSubstringsSet = findCommonSubstrings(
+      subsetArray,
+      lowerOtherStringsCommonSet,
+      mapNames
+    );
     const filteredSubstrings = filterSubstrings(
-      commonSubstrings,
-      lowerSubsetArray,
-      mods
+      commonSubstringsSet,
+      lowerOtherStringsCommonSet
     );
     const substringMatchMap = mapSubstringsToMatches(
       filteredSubstrings,
@@ -190,7 +225,7 @@ import mods from "../data/mods.json";
     if (!(listItem instanceof HTMLElement)) {
       return;
     }
-    const itemValue = listItem.textContent?.trim() ?? "";
+    const itemValue = listItem.getAttribute("data-value")?.trim() ?? "";
     const isSelected = listItem.getAttribute("data-selected") === "true";
     listItem.setAttribute("data-selected", String(!isSelected));
 
