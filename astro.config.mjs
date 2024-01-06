@@ -4,5 +4,7 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://t1nky.github.io',
+  base: '/poe-map-regex',
   integrations: [tailwind()]
 });
