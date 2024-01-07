@@ -1,34 +1,23 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import MapModRow from "../components/MapModRow.astro";
-import mods from "../data/mods.json";
+import Layout from '../layouts/Layout.astro';
+import MapModRow from '../components/MapModRow.astro';
+import mods from '../data/mods.json';
 ---
 
 <Layout title="Poe Map Regex">
-  <main class="h-full p-4 dark:bg-gray-800">
-    <div class="right-4 absolute flex flex-col justify-center ml-3">
+  <main class="h-full p-4 dark:bg-zinc-900">
+    <div class="absolute right-4 ml-3 flex flex-col justify-center">
       <input type="checkbox" id="light-switch" class="light-switch sr-only" />
       <label class="relative cursor-pointer p-2" for="light-switch">
-        <svg
-          class="dark:hidden"
-          width="16"
-          height="16"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg class="dark:hidden" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
           <path
             class="fill-slate-300"
             d="M7 0h2v2H7zM12.88 1.637l1.414 1.415-1.415 1.413-1.413-1.414zM14 7h2v2h-2zM12.95 14.433l-1.414-1.413 1.413-1.415 1.415 1.414zM7 14h2v2H7zM2.98 14.364l-1.413-1.415 1.414-1.414 1.414 1.415zM0 7h2v2H0zM3.05 1.706 4.463 3.12 3.05 4.535 1.636 3.12z"
           ></path>
-          <path
-            class="fill-slate-400"
-            d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z"></path>
+          <path class="fill-slate-400" d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z"
+          ></path>
         </svg>
-        <svg
-          class="hidden dark:block"
-          width="16"
-          height="16"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg class="hidden dark:block" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
           <path
             class="fill-slate-400"
             d="M6.2 1C3.2 1.8 1 4.6 1 7.9 1 11.8 4.2 15 8.1 15c3.3 0 6-2.2 6.9-5.2C9.7 11.2 4.8 6.3 6.2 1Z"
@@ -41,22 +30,23 @@ import mods from "../data/mods.json";
         <span class="sr-only">Switch to light / dark version</span>
       </label>
     </div>
-    <div class="max-w-2xl mx-auto h-full flex flex-col">
-      <h2 class="text-xl font-bold text-gray-700 mb-4 dark:text-gray-100">
-        Generated Regex:
-      </h2>
-      <div id="regexResult" class="p-4 bg-white rounded shadow-md">-</div>
-      <small id="regexLength" class="text-gray-600 dark:text-gray-300"
-        >Length: 0/50</small
-      >
+    <div class="mx-auto flex h-full max-w-2xl flex-col">
+      <h2 class="mb-4 text-xl font-bold text-gray-700 dark:text-gray-100">Generated Regex:</h2>
+      <div id="regexResultContainer" class="relative rounded bg-white p-4 shadow-md">
+        <div id="regexResult">-</div>
+        <button
+          id="copyButton"
+          class="absolute bottom-3 right-2 top-3 rounded border border-blue-500 px-3 text-sm text-blue-500 duration-75 hover:bg-blue-500 hover:text-white"
+          >Copy</button
+        >
+      </div>
+      <small id="regexLength" class="text-gray-600 dark:text-gray-300">Length: 0/50</small>
 
-      <div class="flex justify-between items-center mt-4 mb-4">
-        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-100">
-          Select mods:
-        </h2>
+      <div class="mb-4 mt-4 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-100">Select mods:</h2>
         <button
           id="resetButton"
-          class="duration-100 text-sm border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded px-3 py-0.5"
+          class="rounded border border-red-500 px-3 py-0.5 text-sm text-red-500 duration-100 hover:bg-red-500 hover:text-white"
           >Reset</button
         >
       </div>
@@ -64,11 +54,11 @@ import mods from "../data/mods.json";
         type="search"
         id="regexFilter"
         placeholder="Search"
-        class="p-2 border rounded w-full mb-4"
+        class="mb-4 w-full rounded border p-2"
       />
       <ul
         id="itemList"
-        class="bg-white rounded shadow-md p-2 md:p-4 grow overflow-y-auto dark:bg-gray-700"
+        class="grow overflow-y-auto rounded bg-white p-2 shadow-md dark:bg-zinc-700 md:p-4"
       >
         {mods.map((item) => <MapModRow key={item.toLowerCase()} item={item} />)}
       </ul>
@@ -83,21 +73,21 @@ import mods from "../data/mods.json";
     findCoveringGroups,
     mapSubstringsToMatches,
     generateCommonSubstringsSet,
-  } from "../utils/regex";
-  import mods from "../data/mods.json";
-  import mapNames from "../data/map-names.json";
+  } from '../utils/regex';
+  import mods from '../data/mods.json';
+  import mapNames from '../data/map-names.json';
 
-  const lightSwitches = document.querySelectorAll(".light-switch");
+  const lightSwitches = document.querySelectorAll('.light-switch');
   if (lightSwitches.length > 0) {
     lightSwitches.forEach((lightSwitch, i) => {
       if (!(lightSwitch instanceof HTMLInputElement)) {
         return;
       }
-      if (localStorage.getItem("dark-mode") === "true") {
+      if (localStorage.getItem('dark-mode') === 'true') {
         lightSwitch.checked = true;
       }
 
-      lightSwitch.addEventListener("change", () => {
+      lightSwitch.addEventListener('change', () => {
         const { checked } = lightSwitch;
         lightSwitches.forEach((el, n) => {
           if (!(el instanceof HTMLInputElement)) {
@@ -107,27 +97,27 @@ import mods from "../data/mods.json";
             el.checked = checked;
           }
         });
-        document.documentElement.classList.toggle("dark");
-        localStorage.setItem("dark-mode", String(lightSwitch.checked));
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('dark-mode', String(lightSwitch.checked));
       });
     });
   }
 
   const subsetArray: string[] = [];
 
-  const regexFilterInput = document.getElementById("regexFilter");
-  const itemList = document.getElementById("itemList");
+  const regexFilterInput = document.getElementById('regexFilter');
+  const itemList = document.getElementById('itemList');
 
   function resetSelections() {
     subsetArray.length = 0;
-    const buttons = document.querySelectorAll("#map-mod-row");
+    const buttons = document.querySelectorAll('#map-mod-row');
     buttons.forEach((button) => {
-      button.setAttribute("data-selected", "false");
+      button.setAttribute('data-selected', 'false');
     });
     updateURL();
     updateRegex();
   }
-  document.getElementById("resetButton")?.addEventListener("click", () => {
+  document.getElementById('resetButton')?.addEventListener('click', () => {
     resetSelections();
   });
 
@@ -143,7 +133,7 @@ import mods from "../data/mods.json";
     let regex: RegExp;
 
     try {
-      regex = new RegExp(regexPattern, "i");
+      regex = new RegExp(regexPattern, 'i');
     } catch (e) {
       return;
     }
@@ -152,82 +142,66 @@ import mods from "../data/mods.json";
       if (!(li instanceof HTMLElement)) {
         return;
       }
-      const childDiv = li.querySelector("div");
-      if (regex.test(childDiv?.innerHTML ?? "")) {
-        li.style.display = "";
+      const childDiv = li.querySelector('div');
+      if (regex.test(childDiv?.innerHTML ?? '')) {
+        li.style.display = '';
       } else {
-        li.style.display = "none";
+        li.style.display = 'none';
       }
     });
   }
-
-  if (regexFilterInput) {
-    regexFilterInput.addEventListener("input", () => {
-      filterItems();
-    });
-  }
+  regexFilterInput?.addEventListener('input', () => {
+    filterItems();
+  });
 
   function updateRegex() {
-    const regexResult = document.getElementById("regexResult");
-    const regexLengthInfo = document.getElementById("regexLength");
+    const regexResult = document.getElementById('regexResult');
+    const regexLengthInfo = document.getElementById('regexLength');
     if (!regexResult || !regexLengthInfo) {
       return;
     }
 
-    const lowerSubsetArray = subsetArray.map((s) =>
-      s.toLowerCase().replaceAll("|", "\n")
-    );
-    const lowerFullArray = mods.map((s) => s.toLowerCase().replaceAll("|", "\n"));
+    const lowerSubsetArray = subsetArray.map((s) => s.toLowerCase().replaceAll('|', '\n'));
+    const lowerFullArray = mods.map((s) => s.toLowerCase().replaceAll('|', '\n'));
 
     const lowerSubsetSet = new Set(lowerSubsetArray);
     const lowerOtherStringsCommonSet = generateCommonSubstringsSet(
       lowerFullArray.filter((item) => !lowerSubsetSet.has(item)),
       2,
-      18
+      18,
     );
 
     const commonSubstringsSet = findCommonSubstrings(
       subsetArray,
       lowerOtherStringsCommonSet,
-      mapNames
+      mapNames,
     );
-    const filteredSubstrings = filterSubstrings(
-      commonSubstringsSet,
-      lowerOtherStringsCommonSet
-    );
-    const substringMatchMap = mapSubstringsToMatches(
-      filteredSubstrings,
-      lowerSubsetArray
-    );
-    const allCoveringGroups = findCoveringGroups(
-      substringMatchMap,
-      lowerSubsetArray
-    );
+    const filteredSubstrings = filterSubstrings(commonSubstringsSet, lowerOtherStringsCommonSet);
+    const substringMatchMap = mapSubstringsToMatches(filteredSubstrings, lowerSubsetArray);
+    const allCoveringGroups = findCoveringGroups(substringMatchMap, lowerSubsetArray);
 
     if (allCoveringGroups.length === 0) {
-      regexResult.textContent = "-";
-      regexLengthInfo.innerHTML = "Length: 0/50";
+      regexResult.textContent = '-';
+      regexLengthInfo.innerHTML = 'Length: 0/50';
       return;
     }
-    regexResult.textContent =
-      '"!' + allCoveringGroups.join("|").replace("#", "\\d+") + '"';
-    regexLengthInfo.textContent =
-      "Length: " + regexResult.textContent.length + "/50";
+    regexResult.textContent = '"!' + allCoveringGroups.join('|').replace('#', '\\d+') + '"';
+    regexLengthInfo.textContent = 'Length: ' + regexResult.textContent.length + '/50';
   }
 
   function updateURL() {
     const searchParams = new URLSearchParams();
-    subsetArray.forEach((item) => searchParams.append("selected", item));
-    window.history.replaceState({}, "", "?" + searchParams.toString());
+    subsetArray.forEach((item) => searchParams.append('selected', item));
+    window.history.replaceState({}, '', '?' + searchParams.toString());
   }
   function onRowClick(event: Event) {
     const listItem = event.currentTarget;
     if (!(listItem instanceof HTMLElement)) {
       return;
     }
-    const itemValue = listItem.getAttribute("data-value")?.trim() ?? "";
-    const isSelected = listItem.getAttribute("data-selected") === "true";
-    listItem.setAttribute("data-selected", String(!isSelected));
+    const itemValue = listItem.getAttribute('data-value')?.trim() ?? '';
+    const isSelected = listItem.getAttribute('data-selected') === 'true';
+    listItem.setAttribute('data-selected', String(!isSelected));
 
     if (!isSelected) {
       subsetArray.push(itemValue);
@@ -241,23 +215,41 @@ import mods from "../data/mods.json";
     updateURL();
     updateRegex();
   }
-  const buttons = document.querySelectorAll("#map-mod-row");
+  const buttons = document.querySelectorAll('#map-mod-row');
   buttons.forEach((button) => {
-    button.addEventListener("click", onRowClick);
+    button.addEventListener('click', onRowClick);
+  });
+
+  function copyToClipboard() {
+    const regexText = document.getElementById('regexResult')?.textContent;
+    if (!regexText) {
+      return;
+    }
+    navigator.clipboard
+      .writeText(regexText)
+      .then(() => {
+        console.log('Regex copied to clipboard');
+        // Optionally, display a confirmation message to the user
+      })
+      .catch((err) => {
+        console.error('Failed to copy regex: ', err);
+        // Optionally, handle the error case
+      });
+  }
+  document.getElementById('copyButton')?.addEventListener('click', () => {
+    copyToClipboard();
   });
 
   const searchParams = new URLSearchParams(window.location.search);
-  const selectedItems = searchParams.getAll("selected");
+  const selectedItems = searchParams.getAll('selected');
 
   // Initialize your state with these items
   selectedItems.forEach((item) => {
-    const listItem = document.querySelector(
-      `#map-mod-row[data-value="${item}"]`
-    );
+    const listItem = document.querySelector(`#map-mod-row[data-value="${item}"]`);
     if (!(listItem instanceof HTMLElement)) {
       return;
     }
-    listItem.setAttribute("data-selected", "true");
+    listItem.setAttribute('data-selected', 'true');
     subsetArray.push(item);
   });
   updateRegex();

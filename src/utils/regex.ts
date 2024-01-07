@@ -3,8 +3,7 @@ const getSubstrings = (str: string, minLength = 2, maxLength = 18) => {
   for (let i = 0; i < str.length; i++) {
     for (let j = i + minLength; j <= i + maxLength && j <= str.length; j++) {
       const substr = str.substring(i, j);
-      if (substr.startsWith(" ") || substr.endsWith(" ")) continue;
-      if (substr.includes("\n")) continue;
+      if (substr.startsWith(' ') || substr.endsWith(' ') || substr.includes('\n')) continue;
       substrings.add(substr);
     }
   }
@@ -14,11 +13,7 @@ const getSubstrings = (str: string, minLength = 2, maxLength = 18) => {
 export function generateCommonSubstringsSet(array: string[], minLength: number, maxLength: number) {
   let commonSet = new Set<string>();
   array.forEach((str) => {
-    let commonSubstrings = getSubstrings(
-      str.toLowerCase(),
-      minLength,
-      maxLength
-    );
+    let commonSubstrings = getSubstrings(str.toLowerCase(), minLength, maxLength);
     commonSubstrings.forEach((substring) => commonSet.add(substring));
   });
   return commonSet;
@@ -29,14 +24,10 @@ export function findCommonSubstrings(
   lowerOtherStringsCommonSet: Set<string>,
   exclusionArray: string[] = [],
   minLength = 2,
-  maxLength = 18
+  maxLength = 18,
 ) {
   const lowerSubsetSet = new Set(subsetArray.map((s) => s.toLowerCase()));
-  const lowerExclusionSet = generateCommonSubstringsSet(
-    exclusionArray,
-    minLength,
-    maxLength
-  );
+  const lowerExclusionSet = generateCommonSubstringsSet(exclusionArray, minLength, maxLength);
 
   let allCommonSubstrings = new Set<string>();
 
@@ -46,10 +37,7 @@ export function findCommonSubstrings(
   });
 
   allCommonSubstrings.forEach((substring) => {
-    if (
-      lowerExclusionSet.has(substring) ||
-      lowerOtherStringsCommonSet.has(substring)
-    ) {
+    if (lowerExclusionSet.has(substring) || lowerOtherStringsCommonSet.has(substring)) {
       allCommonSubstrings.delete(substring);
     }
   });
@@ -57,7 +45,10 @@ export function findCommonSubstrings(
   return allCommonSubstrings;
 }
 
-export function mapSubstringsToMatches(filteredSubstringsSet: Set<string>, lowerSubsetArray: string[]) {
+export function mapSubstringsToMatches(
+  filteredSubstringsSet: Set<string>,
+  lowerSubsetArray: string[],
+) {
   let substringMatchMap = new Map();
 
   filteredSubstringsSet.forEach((substring) => {
@@ -68,32 +59,30 @@ export function mapSubstringsToMatches(filteredSubstringsSet: Set<string>, lower
   return substringMatchMap;
 }
 
-export function findCoveringGroups(substringMatchMap: Map<string, Set<string>>, lowerSubsetArray: string[]) {
+export function findCoveringGroups(
+  substringMatchMap: Map<string, Set<string>>,
+  lowerSubsetArray: string[],
+) {
   let coveredItems = new Set();
   let regexGroups = [];
 
   while (coveredItems.size < lowerSubsetArray.length) {
-    let sortedSubstrings = Array.from(substringMatchMap.entries()).sort(
-      (a, b) => {
-        // Calculate effective coverage considering already covered items
-        let aCoverage = Array.from(a[1]).filter(
-          (item) => !coveredItems.has(item)
-        ).length;
-        let bCoverage = Array.from(b[1]).filter(
-          (item) => !coveredItems.has(item)
-        ).length;
-        return bCoverage - aCoverage || a[0].length - b[0].length;
-      }
-    );
+    let sortedSubstrings = Array.from(substringMatchMap.entries()).sort((a, b) => {
+      // Calculate effective coverage considering already covered items
+      let aCoverage = Array.from(a[1]).filter((item) => !coveredItems.has(item)).length;
+      let bCoverage = Array.from(b[1]).filter((item) => !coveredItems.has(item)).length;
+      return bCoverage - aCoverage || a[0].length - b[0].length;
+    });
 
     const [substring, matchingItems] = sortedSubstrings[0]; // Pick the first after re-sorting
 
     if (Array.from(matchingItems).some((item) => !coveredItems.has(item))) {
       regexGroups.push(substring);
       matchingItems.forEach((item) => coveredItems.add(item));
-      substringMatchMap.delete(substring); // Remove used substring from the map
+      substringMatchMap.delete(substring);
     } else {
-      break; // Break if no new items can be covered
+      // Break if no new items can be covered
+      break;
     }
   }
 
@@ -141,7 +130,10 @@ function findCoveringGroups(substringMatchMap, lowerSubsetArray) {
 }
 */
 
-export function filterSubstrings(commonSubstringsSet: Set<string>, lowerOtherStringsCommonSet: Set<string>) {
+export function filterSubstrings(
+  commonSubstringsSet: Set<string>,
+  lowerOtherStringsCommonSet: Set<string>,
+) {
   commonSubstringsSet.forEach((substring) => {
     if (lowerOtherStringsCommonSet.has(substring)) {
       commonSubstringsSet.delete(substring);
