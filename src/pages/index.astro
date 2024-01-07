@@ -61,7 +61,7 @@ import mods from '../data/mods.json';
       />
       <ul
         id="itemList"
-        class="grow overflow-y-auto rounded bg-white p-2 shadow-md dark:bg-zinc-700 dark:shadow-black/50 md:p-4"
+        class="grow space-y-0.5 overflow-y-auto rounded bg-white p-2 shadow-md dark:bg-zinc-700 dark:shadow-black/50 md:p-4"
       >
         {mods.map((item) => <MapModRow key={item.toLowerCase()} item={item} />)}
       </ul>
