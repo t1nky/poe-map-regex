@@ -5,7 +5,7 @@ import mods from '../data/mods.json';
 ---
 
 <Layout title="Poe Map Regex">
-  <main class="h-full p-4 dark:bg-zinc-900">
+  <main class="h-full p-4 transition-colors duration-300 dark:bg-zinc-900">
     <div class="absolute right-4 ml-3 flex flex-col justify-center">
       <input type="checkbox" id="light-switch" class="light-switch sr-only" />
       <label class="relative cursor-pointer p-2" for="light-switch">
@@ -41,8 +41,38 @@ import mods from '../data/mods.json';
         </div>
         <button
           id="copyButton"
-          class="rounded border border-blue-500 px-3 py-1 text-xs text-blue-500 duration-75 hover:bg-blue-500 hover:text-white md:text-sm"
-          >Copy</button
+          class="rounded border border-blue-500 p-2 text-xs text-blue-500 duration-75 hover:bg-blue-500 hover:text-white md:text-sm"
+          ><div class="relative h-4 w-4">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              'stroke-width'="1.5"
+              'stroke-linecap'="round"
+              'stroke-linejoin'="round"
+              class="copy-button absolute left-0 top-0 [stroke-dasharray:50]"
+            >
+              <path d="M5.75 4.75H10.25V1.75H5.75V4.75Z"></path>
+              <path
+                d="M3.25 2.88379C2.9511 3.05669 2.75 3.37987 2.75 3.75001V13.25C2.75 13.8023 3.19772 14.25 3.75 14.25H12.25C12.8023 14.25 13.25 13.8023 13.25 13.25V3.75001C13.25 3.37987 13.0489 3.05669 12.75 2.88379"
+              ></path>
+            </svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              'stroke-width'="1.5"
+              'stroke-linecap'="round"
+              'stroke-linejoin'="round"
+              class="copy-button copy-button-hide absolute left-0 top-0 [stroke-dasharray:50]"
+            >
+              <path d="M13.25 4.75L6 12L2.75 8.75"></path>
+            </svg>
+          </div></button
         >
       </div>
       <small id="regexLength" class="text-gray-600 dark:text-gray-300">Length: 0/50</small>
@@ -225,11 +255,20 @@ import mods from '../data/mods.json';
     button.addEventListener('click', onRowClick);
   });
 
-  function copyToClipboard() {
+  function copyToClipboard(e: MouseEvent) {
     const regexText = document.getElementById('regexResult')?.textContent;
     if (!regexText) {
       return;
     }
+    const button = (e.currentTarget as HTMLButtonElement).children[0];
+
+    button.children[0].classList.add('copy-button-hide');
+    button.children[1].classList.remove('copy-button-hide');
+    setTimeout(() => {
+      button.children[0].classList.remove('copy-button-hide');
+      button.children[1].classList.add('copy-button-hide');
+    }, 1500);
+
     navigator.clipboard
       .writeText(regexText)
       .then(() => {
@@ -241,8 +280,8 @@ import mods from '../data/mods.json';
         // Optionally, handle the error case
       });
   }
-  document.getElementById('copyButton')?.addEventListener('click', () => {
-    copyToClipboard();
+  document.getElementById('copyButton')?.addEventListener('click', (e) => {
+    copyToClipboard(e);
   });
 
   const searchParams = new URLSearchParams(window.location.search);
@@ -259,3 +298,18 @@ import mods from '../data/mods.json';
   });
   updateRegex();
 </script>
+
+<style>
+  .copy-button {
+    transition:
+      stroke-dashoffset 300ms ease-in-out,
+      color 75ms,
+      fill 75ms,
+      decoration-color 75ms,
+      stroke 75ms;
+  }
+
+  .copy-button-hide {
+    stroke-dashoffset: -50;
+  }
+</style>
