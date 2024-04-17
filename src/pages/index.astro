@@ -1,79 +1,90 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import MapModRow from '../components/MapModRow.astro';
-import mods from '../data/mods.json';
+import mods from '../data/map_mods.json';
+import ThemeSwitch from '../components/ThemeSwitch.astro';
 ---
+
+<script is:inline>
+  function copyToClipboard(copyIcon, checkIcon, text) {
+    if (!text) {
+      console.log('No text to copy');
+      return;
+    }
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        console.log('Text copied to clipboard');
+        copyIcon.classList.add('copy-button-hide');
+        checkIcon.classList.remove('copy-button-hide');
+        setTimeout(() => {
+          copyIcon.classList.remove('copy-button-hide');
+          checkIcon.classList.add('copy-button-hide');
+        }, 1500);
+      })
+      .catch((err) => {
+        console.error('Failed to copy text:', err);
+      });
+  }
+</script>
 
 <Layout title="Poe Map Regex">
   <main class="h-full p-4 transition-colors duration-300 dark:bg-zinc-900">
-    <div class="absolute right-4 ml-3 flex flex-col justify-center">
-      <input type="checkbox" id="light-switch" class="light-switch sr-only" />
-      <label class="relative cursor-pointer p-2" for="light-switch">
-        <svg class="dark:hidden" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-          <path
-            class="fill-slate-300"
-            d="M7 0h2v2H7zM12.88 1.637l1.414 1.415-1.415 1.413-1.413-1.414zM14 7h2v2h-2zM12.95 14.433l-1.414-1.413 1.413-1.415 1.415 1.414zM7 14h2v2H7zM2.98 14.364l-1.413-1.415 1.414-1.414 1.414 1.415zM0 7h2v2H0zM3.05 1.706 4.463 3.12 3.05 4.535 1.636 3.12z"
-          ></path>
-          <path class="fill-slate-400" d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z"
-          ></path>
-        </svg>
-        <svg class="hidden dark:block" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-          <path
-            class="fill-slate-400"
-            d="M6.2 1C3.2 1.8 1 4.6 1 7.9 1 11.8 4.2 15 8.1 15c3.3 0 6-2.2 6.9-5.2C9.7 11.2 4.8 6.3 6.2 1Z"
-          ></path>
-          <path
-            class="fill-slate-500"
-            d="M12.5 5a.625.625 0 0 1-.625-.625 1.252 1.252 0 0 0-1.25-1.25.625.625 0 1 1 0-1.25 1.252 1.252 0 0 0 1.25-1.25.625.625 0 1 1 1.25 0c.001.69.56 1.249 1.25 1.25a.625.625 0 1 1 0 1.25c-.69.001-1.249.56-1.25 1.25A.625.625 0 0 1 12.5 5Z"
-          ></path>
-        </svg>
-        <span class="sr-only">Switch to light / dark version</span>
-      </label>
-    </div>
-    <div class="mx-auto flex h-full max-w-2xl flex-col">
+    <ThemeSwitch />
+    <div class="mx-auto flex h-full max-w-2xl flex-col" x-data="$store.itemList">
       <h2 class="mb-4 text-xl font-bold text-gray-700 dark:text-gray-100">Generated Regex:</h2>
       <div
         id="regexResultContainer"
         class="relative flex flex-row items-center gap-1 rounded bg-white p-2 shadow-md dark:shadow-black/50"
       >
-        <div id="regexResult" class="grow overflow-auto whitespace-nowrap text-xs md:text-base">
+        <div
+          id="regexResult"
+          x-ref="textContainer"
+          class="grow overflow-auto whitespace-nowrap text-xs md:text-base"
+        >
           -
         </div>
-        <button
-          id="copyButton"
-          class="rounded border border-blue-500 p-2 text-xs text-blue-500 duration-75 hover:bg-blue-500 hover:text-white md:text-sm"
-          ><div class="relative h-4 w-4">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              'stroke-width'="1.5"
-              'stroke-linecap'="round"
-              'stroke-linejoin'="round"
-              class="copy-button absolute left-0 top-0 [stroke-dasharray:50]"
-            >
-              <path d="M5.75 4.75H10.25V1.75H5.75V4.75Z"></path>
-              <path
-                d="M3.25 2.88379C2.9511 3.05669 2.75 3.37987 2.75 3.75001V13.25C2.75 13.8023 3.19772 14.25 3.75 14.25H12.25C12.8023 14.25 13.25 13.8023 13.25 13.25V3.75001C13.25 3.37987 13.0489 3.05669 12.75 2.88379"
-              ></path>
-            </svg>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              'stroke-width'="1.5"
-              'stroke-linecap'="round"
-              'stroke-linejoin'="round"
-              class="copy-button copy-button-hide absolute left-0 top-0 [stroke-dasharray:50]"
-            >
-              <path d="M13.25 4.75L6 12L2.75 8.75"></path>
-            </svg>
-          </div></button
-        >
+        <div>
+          <button
+            id="copyButton"
+            @click="copyToClipboard($refs.copyIcon, $refs.checkIcon, $refs.textContainer.textContent)"
+            class="rounded border border-blue-500 p-2 text-xs text-blue-500 duration-75 hover:bg-blue-500 hover:text-white md:text-sm"
+          >
+            <div class="relative h-4 w-4">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="copy-button absolute left-0 top-0 [stroke-dasharray:50]"
+                x-ref="copyIcon"
+              >
+                <path d="M5.75 4.75H10.25V1.75H5.75V4.75Z"></path>
+                <path
+                  d="M3.25 2.88379C2.9511 3.05669 2.75 3.37987 2.75 3.75001V13.25C2.75 13.8023 3.19772 14.25 3.75 14.25H12.25C12.8023 14.25 13.25 13.8023 13.25 13.25V3.75001C13.25 3.37987 13.0489 3.05669 12.75 2.88379"
+                ></path>
+              </svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="copy-button copy-button-hide absolute left-0 top-0 [stroke-dasharray:50]"
+                x-ref="checkIcon"
+              >
+                <path d="M13.25 4.75L6 12L2.75 8.75"></path>
+              </svg>
+            </div>
+          </button>
+        </div>
       </div>
       <small id="regexLength" class="text-gray-600 dark:text-gray-300">Length: 0/50</small>
 
@@ -82,24 +93,54 @@ import mods from '../data/mods.json';
         <button
           id="resetButton"
           class="rounded border border-red-500 px-3 py-0.5 text-sm text-red-500 duration-100 hover:bg-red-500 hover:text-white"
-          >Reset</button
+          @click="resetSelections()">Reset</button
         >
       </div>
-      <input
-        type="search"
-        id="regexFilter"
-        placeholder="Search"
-        class="mb-4 w-full rounded border p-2 shadow-md dark:shadow-black/50"
-      />
+      <div class="flex flex-row gap-2 divide-x pb-4 dark:divide-gray-600">
+        <input
+          type="search"
+          id="regexFilter"
+          placeholder="Search"
+          class="w-full rounded border p-2 shadow-md dark:shadow-black/50"
+          x-data="itemListFilter"
+          x-model="filterRegex"
+        />
+        <div class="flex flex-row items-center gap-2 pl-2">
+          <input
+            type="checkbox"
+            id="uber"
+            x-model="uber"
+            x-init="$watch('uber', val => updateUber($refs.itemList))"
+            class="h-5 w-5 rounded border-gray-300 text-blue-500 transition-all duration-300 focus:ring-blue-500"
+          />
+          <label for="uber" class="text-md font-medium text-gray-700 dark:text-gray-100">T17</label>
+        </div>
+      </div>
       <ul
         id="itemList"
-        class="grow space-y-0.5 overflow-y-auto rounded bg-white p-2 shadow-md dark:bg-zinc-700 dark:shadow-black/50 md:p-4"
+        class="group grow space-y-0.5 overflow-y-auto rounded bg-white p-2 opacity-0 shadow-md transition-opacity duration-1000 data-[uber]:overflow-y-auto data-[uber]:opacity-100 dark:bg-zinc-700 dark:shadow-black/50 md:p-4"
+        x-ref="itemList"
       >
-        {mods.map((item) => <MapModRow key={item.toLowerCase()} item={item} />)}
+        {mods.normal.map((item) => <MapModRow key={item.toLowerCase()} item={item} uber={false} />)}
+        {mods.uber.map((item) => <MapModRow key={item.toLowerCase()} item={item} uber={true} />)}
       </ul>
     </div>
   </main>
 </Layout>
+
+<script>
+  let uberType = new URLSearchParams(window.location.search).get('uber') ? 'uber' : 'normal';
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const itemList = document.querySelector('#itemList');
+    if (!itemList) {
+      return;
+    }
+    if (itemList instanceof HTMLElement) {
+      itemList.dataset.uber = uberType;
+    }
+  });
+</script>
 
 <script>
   import {
@@ -109,197 +150,204 @@ import mods from '../data/mods.json';
     mapSubstringsToMatches,
     generateCommonSubstringsSet,
   } from '../utils/regex';
-  import mods from '../data/mods.json';
-  import mapNames from '../data/map-names.json';
+  import mapCombined from '../data/maps_combined.json';
+  import Alpine from 'alpinejs';
+  import mods from '../data/map_mods.json';
 
-  const lightSwitches = document.querySelectorAll('.light-switch');
-  if (lightSwitches.length > 0) {
-    lightSwitches.forEach((lightSwitch, i) => {
-      if (!(lightSwitch instanceof HTMLInputElement)) {
-        return;
-      }
-      if (localStorage.getItem('dark-mode') === 'true') {
-        lightSwitch.checked = true;
-      }
-
-      lightSwitch.addEventListener('change', () => {
-        const { checked } = lightSwitch;
-        lightSwitches.forEach((el, n) => {
-          if (!(el instanceof HTMLInputElement)) {
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('itemListFilter', () => ({
+      filterRegex: '',
+      filterItems(value: string) {
+        const regex = new RegExp(value, 'i');
+        Array.from(this.$refs.itemList.childNodes).forEach((li) => {
+          if (!(li instanceof HTMLElement)) {
             return;
           }
-          if (n !== i) {
-            el.checked = checked;
+          const childDiv = li.querySelector('div');
+          if (regex.test(childDiv?.innerHTML ?? '')) {
+            li.style.display = '';
+          } else {
+            li.style.display = 'none';
           }
         });
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('dark-mode', String(lightSwitch.checked));
-      });
-    });
-  }
+      },
+      init() {
+        this.$watch('filterRegex', (val) => this.filterItems(val));
+      },
+    }));
 
-  const subsetArray: string[] = [];
+    Alpine.store('itemList', () => ({
+      uber: false,
+      subsetArray: {
+        uber: [] as string[],
+        normal: [] as string[],
+      },
+      updateUber(itemList: HTMLUListElement) {
+        itemList.dataset.uber = this.uber ? 'uber' : 'normal';
+        this.updateRegex();
+        this.updateURL();
+      },
+      updateURL() {
+        const searchParams = new URLSearchParams();
+        this.subsetArray.uber.forEach((item) => searchParams.append('selectedUber', item));
+        this.subsetArray.normal.forEach((item) => searchParams.append('selectedNormal', item));
+        if (this.uber) {
+          searchParams.append('uber', 'true');
+        }
+        const paramsString = searchParams.toString();
+        window.history.replaceState(
+          {},
+          '',
+          paramsString ? `?${paramsString}` : window.location.pathname
+        );
+      },
+      updateRegex() {
+        const regexResult = document.getElementById('regexResult');
+        const regexLengthInfo = document.getElementById('regexLength');
+        if (!regexResult || !regexLengthInfo) {
+          return;
+        }
 
-  const regexFilterInput = document.getElementById('regexFilter');
-  const itemList = document.getElementById('itemList');
+        const lowerSubsetArray = (this.uber ? this.subsetArray.uber : this.subsetArray.normal).map(
+          (s) => s.toLowerCase().replaceAll('|', '\n')
+        );
+        const lowerFullArray = (this.uber ? mods.uber : mods.normal).map((s) =>
+          s.toLowerCase().replaceAll('|', '\n')
+        );
 
-  function resetSelections() {
-    subsetArray.length = 0;
-    const buttons = document.querySelectorAll('#map-mod-row');
-    buttons.forEach((button) => {
-      button.setAttribute('data-selected', 'false');
-    });
-    updateURL();
-    updateRegex();
-  }
-  document.getElementById('resetButton')?.addEventListener('click', () => {
-    resetSelections();
+        const lowerSubsetSet = new Set(lowerSubsetArray);
+        const lowerOtherStringsCommonSet = generateCommonSubstringsSet(
+          lowerFullArray.filter((item) => !lowerSubsetSet.has(item)),
+          2,
+          18
+        );
+
+        const commonSubstringsSet = findCommonSubstrings(
+          this.uber ? this.subsetArray.uber : this.subsetArray.normal,
+          lowerOtherStringsCommonSet,
+          this.uber ? mapCombined.uber : mapCombined.normal
+        );
+        const filteredSubstrings = filterSubstrings(
+          commonSubstringsSet,
+          lowerOtherStringsCommonSet
+        );
+        const substringMatchMap = mapSubstringsToMatches(filteredSubstrings, lowerSubsetArray);
+        const allCoveringGroups = findCoveringGroups(substringMatchMap, lowerSubsetArray);
+
+        if (allCoveringGroups.length === 0) {
+          regexResult.textContent = '-';
+          regexLengthInfo.innerHTML = 'Length: 0/50';
+          return;
+        }
+        regexResult.textContent = '"!' + allCoveringGroups.join('|').replace('#', '\\d+') + '"';
+        regexLengthInfo.textContent = 'Length: ' + regexResult.textContent.length + '/50';
+      },
+      onRowClick(event: Event) {
+        const listItem = event.currentTarget;
+        if (!(listItem instanceof HTMLElement)) {
+          return;
+        }
+        const itemValue = listItem.getAttribute('data-value')?.trim() ?? '';
+        const isSelected = listItem.getAttribute('data-selected') === 'true';
+        const uberValue = listItem.getAttribute('data-uber') === 'uber';
+        listItem.setAttribute('data-selected', String(!isSelected));
+
+        if (!isSelected) {
+          if (uberValue) {
+            this.subsetArray.uber.push(itemValue);
+          } else {
+            this.subsetArray.normal.push(itemValue);
+          }
+        } else {
+          const index = (uberValue ? this.subsetArray.uber : this.subsetArray.normal).indexOf(
+            itemValue
+          );
+          if (index > -1) {
+            if (uberValue) {
+              this.subsetArray.uber.splice(index, 1);
+            } else {
+              this.subsetArray.normal.splice(index, 1);
+            }
+          }
+        }
+
+        this.updateURL();
+        this.updateRegex();
+      },
+      resetSelections() {
+        if (this.uber) {
+          this.subsetArray.uber.length = 0;
+        } else {
+          this.subsetArray.normal.length = 0;
+        }
+        const buttons = document.querySelectorAll(
+          `#map-mod-row[data-uber="${this.uber ? 'uber' : 'normal'}"]`
+        );
+        buttons.forEach((button) => {
+          button.setAttribute('data-selected', 'false');
+        });
+        this.updateURL();
+        this.updateRegex();
+      },
+      init() {
+        const searchParams = new URLSearchParams(window.location.search);
+
+        searchParams.getAll('selectedUber').forEach((item) => {
+          const listItem = document.querySelector(
+            `#map-mod-row[data-value="${item.replaceAll('\n', '|')}"][data-uber="uber"]`
+          );
+          if (!(listItem instanceof HTMLElement)) {
+            console.log('Item not found');
+            return;
+          }
+          listItem.setAttribute('data-selected', 'true');
+          this.subsetArray.uber.push(item);
+        });
+        searchParams.getAll('selectedNormal').forEach((item) => {
+          const listItem = document.querySelector(
+            `#map-mod-row[data-value="${item.replaceAll('\n', '|')}"][data-uber="normal"]`
+          );
+          if (!(listItem instanceof HTMLElement)) {
+            console.log('Item not found');
+            return;
+          }
+          listItem.setAttribute('data-selected', 'true');
+          this.subsetArray.normal.push(item);
+        });
+        if (searchParams.get('uber') === 'true') {
+          this.uber = true;
+        }
+        this.updateRegex();
+      },
+    }));
   });
-
-  function filterItems() {
-    if (!regexFilterInput || !itemList) {
-      return;
-    }
-    if (!(regexFilterInput instanceof HTMLInputElement)) {
-      return;
-    }
-
-    const regexPattern = regexFilterInput.value;
-    let regex: RegExp;
-
-    try {
-      regex = new RegExp(regexPattern, 'i');
-    } catch (e) {
-      return;
-    }
-
-    Array.from(itemList.childNodes).forEach((li) => {
-      if (!(li instanceof HTMLElement)) {
-        return;
-      }
-      const childDiv = li.querySelector('div');
-      if (regex.test(childDiv?.innerHTML ?? '')) {
-        li.style.display = '';
-      } else {
-        li.style.display = 'none';
-      }
-    });
-  }
-  regexFilterInput?.addEventListener('input', () => {
-    filterItems();
-  });
-
-  function updateRegex() {
-    const regexResult = document.getElementById('regexResult');
-    const regexLengthInfo = document.getElementById('regexLength');
-    if (!regexResult || !regexLengthInfo) {
-      return;
-    }
-
-    const lowerSubsetArray = subsetArray.map((s) => s.toLowerCase().replaceAll('|', '\n'));
-    const lowerFullArray = mods.map((s) => s.toLowerCase().replaceAll('|', '\n'));
-
-    const lowerSubsetSet = new Set(lowerSubsetArray);
-    const lowerOtherStringsCommonSet = generateCommonSubstringsSet(
-      lowerFullArray.filter((item) => !lowerSubsetSet.has(item)),
-      2,
-      18,
-    );
-
-    const commonSubstringsSet = findCommonSubstrings(
-      subsetArray,
-      lowerOtherStringsCommonSet,
-      mapNames,
-    );
-    const filteredSubstrings = filterSubstrings(commonSubstringsSet, lowerOtherStringsCommonSet);
-    const substringMatchMap = mapSubstringsToMatches(filteredSubstrings, lowerSubsetArray);
-    const allCoveringGroups = findCoveringGroups(substringMatchMap, lowerSubsetArray);
-
-    if (allCoveringGroups.length === 0) {
-      regexResult.textContent = '-';
-      regexLengthInfo.innerHTML = 'Length: 0/50';
-      return;
-    }
-    regexResult.textContent = '"!' + allCoveringGroups.join('|').replace('#', '\\d+') + '"';
-    regexLengthInfo.textContent = 'Length: ' + regexResult.textContent.length + '/50';
-  }
-
-  function updateURL() {
-    const searchParams = new URLSearchParams();
-    subsetArray.forEach((item) => searchParams.append('selected', item));
-    window.history.replaceState({}, '', '?' + searchParams.toString());
-  }
-  function onRowClick(event: Event) {
-    const listItem = event.currentTarget;
-    if (!(listItem instanceof HTMLElement)) {
-      return;
-    }
-    const itemValue = listItem.getAttribute('data-value')?.trim() ?? '';
-    const isSelected = listItem.getAttribute('data-selected') === 'true';
-    listItem.setAttribute('data-selected', String(!isSelected));
-
-    if (!isSelected) {
-      subsetArray.push(itemValue);
-    } else {
-      const index = subsetArray.indexOf(itemValue);
-      if (index > -1) {
-        subsetArray.splice(index, 1);
-      }
-    }
-
-    updateURL();
-    updateRegex();
-  }
-  const buttons = document.querySelectorAll('#map-mod-row');
-  buttons.forEach((button) => {
-    button.addEventListener('click', onRowClick);
-  });
-
-  function copyToClipboard(e: MouseEvent) {
-    const regexText = document.getElementById('regexResult')?.textContent;
-    if (!regexText) {
-      return;
-    }
-    const button = (e.currentTarget as HTMLButtonElement).children[0];
-
-    button.children[0].classList.add('copy-button-hide');
-    button.children[1].classList.remove('copy-button-hide');
-    setTimeout(() => {
-      button.children[0].classList.remove('copy-button-hide');
-      button.children[1].classList.add('copy-button-hide');
-    }, 1500);
-
-    navigator.clipboard
-      .writeText(regexText)
-      .then(() => {
-        console.log('Regex copied to clipboard');
-        // Optionally, display a confirmation message to the user
-      })
-      .catch((err) => {
-        console.error('Failed to copy regex: ', err);
-        // Optionally, handle the error case
-      });
-  }
-  document.getElementById('copyButton')?.addEventListener('click', (e) => {
-    copyToClipboard(e);
-  });
-
-  const searchParams = new URLSearchParams(window.location.search);
-  const selectedItems = searchParams.getAll('selected');
-
-  // Initialize your state with these items
-  selectedItems.forEach((item) => {
-    const listItem = document.querySelector(`#map-mod-row[data-value="${item}"]`);
-    if (!(listItem instanceof HTMLElement)) {
-      return;
-    }
-    listItem.setAttribute('data-selected', 'true');
-    subsetArray.push(item);
-  });
-  updateRegex();
 </script>
 
 <style>
+  #itemList::-webkit-scrollbar {
+    width: 12px;
+  }
+  #itemList::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: #e7e7e7;
+    border: 1px solid #cacaca;
+  }
+
+  #itemList::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: theme('colors.gray.500');
+  }
+
+  html[data-theme='dark'] #itemList::-webkit-scrollbar-track {
+    background-color: theme('colors.zinc.800');
+    border: 1px solid theme('colors.zinc.600');
+  }
+
+  html[data-theme='dark'] #itemList::-webkit-scrollbar-thumb {
+    background-color: theme('colors.gray.300 / 0%');
+    border: 2px solid theme('colors.gray.100');
+  }
+
   .copy-button {
     transition:
       stroke-dashoffset 300ms ease-in-out,

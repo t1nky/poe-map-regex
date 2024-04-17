@@ -1,15 +1,16 @@
 ---
-const { item, onRowClick } = Astro.props;
+const { uber, item } = Astro.props;
 ---
 
 <li
   id="map-mod-row"
-  class="flex cursor-pointer items-center rounded p-1.5 hover:bg-black/10 data-[selected=true]:bg-green-400 dark:hover:bg-white/10 dark:data-[selected=true]:bg-green-950"
-  onclick={onRowClick}
-  data-value={item}
+  class=`flex cursor-pointer items-center rounded p-1.5 hover:bg-black/10 data-[selected=true]:bg-green-400 dark:hover:bg-white/10 dark:data-[selected=true]:bg-green-950 transition-opacity duration-300 ${uber ? "group-data-[uber='normal']:hidden" : "group-data-[uber='uber']:hidden"}`
+  data-value={item.replaceAll('\n', '|')}
+  @click="onRowClick($event)"
+  data-uber={uber ? 'uber' : 'normal'}
 >
   <div
     class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-100"
-    set:html={item.replace(/\|/g, '<br>')}
+    set:html={item.replaceAll('\n', '<br>')}
   />
 </li>

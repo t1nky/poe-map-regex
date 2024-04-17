@@ -1,0 +1,22 @@
+---
+import 'tailwindcss/tailwind.css';
+import LightIcon from './LightIcon.astro';
+import DarkIcon from './DarkIcon.astro';
+---
+
+<div id="darkToggle" class="absolute right-4 ml-3 flex flex-col justify-center" @click.stop>
+  <input
+    @click="darkMode = (darkMode === 'dark' ? 'light' : 'dark')"
+    :value="darkMode === 'dark'"
+    type="checkbox"
+    class="sr-only"
+    id="theme-switch"
+  />
+  <label for="theme-switch" class="relative cursor-pointer p-2">
+    <LightIcon />
+    <DarkIcon />
+    <span
+      class="sr-only"
+      x-text="darkMode === 'dark' ? 'Switch to light version' : 'Switch to dark version'"></span>
+  </label>
+</div>
