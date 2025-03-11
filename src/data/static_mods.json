@@ -6,15 +6,15 @@
         "Item Quantity:",
         "Item Rarity:",
         "Monster Pack Size:",
-        "More Maps",
-        "More Scarabs",
-        "More Currency",
+        "More Maps:",
+        "More Scarabs:",
+        "More Currency:",
         "Quality:",
         "Item Level:",
         "Monster Level:",
         "Travel to this Map by using it in a personal Map Device. Maps can only be used once.",
         "Corrupted",
-        "augmented"
+        "(augmented)"
     ],
     "normal": [
         "Item Class:",
@@ -28,6 +28,6 @@
         "Monster Level:",
         "Travel to this Map by using it in a personal Map Device. Maps can only be used once.",
         "Corrupted",
-        "augmented"
+        "(augmented)"
     ]
 }
