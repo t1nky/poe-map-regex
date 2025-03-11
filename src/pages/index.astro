@@ -228,7 +228,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
           findCommonSubstrings(
             this.uber ? this.subsetArray.uber : this.subsetArray.normal,
             lowerOtherStringsCommonSet,
-            [...(this.uber ? mapNames.uber : mapNames.normal), ...staticMods],
+            [...(this.uber ? mapNames.uber : mapNames.normal), ...(this.uber ? staticMods.uber : staticMods.normal)],
           ),
         );
 
@@ -236,7 +236,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
           findCommonSubstrings(
             this.uber ? this.subsetArray.uber : this.subsetArray.normal,
             lowerOtherStringsCommonSet,
-            [...(this.uber ? mapWords.uber : mapWords.normal), ...staticMods],
+            [...(this.uber ? mapWords.uber : mapWords.normal), ...(this.uber ? staticMods.uber : staticMods.normal)],
           ),
         );
 
