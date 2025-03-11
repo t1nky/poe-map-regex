@@ -152,6 +152,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
   } from '../utils/regex';
   import mapWords from '../data/map_words.json';
   import mapNames from '../data/map_names.json';
+  import staticMods from '../data/static_mods.json';
   import Alpine from 'alpinejs';
   import mods from '../data/map_mods.json';
 
@@ -227,7 +228,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
           findCommonSubstrings(
             this.uber ? this.subsetArray.uber : this.subsetArray.normal,
             lowerOtherStringsCommonSet,
-            this.uber ? mapNames.uber : mapNames.normal,
+            [...(this.uber ? mapNames.uber : mapNames.normal), ...staticMods],
           ),
         );
 
@@ -235,7 +236,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
           findCommonSubstrings(
             this.uber ? this.subsetArray.uber : this.subsetArray.normal,
             lowerOtherStringsCommonSet,
-            this.uber ? mapWords.uber : mapWords.normal,
+            [...(this.uber ? mapWords.uber : mapWords.normal), ...staticMods],
           ),
         );
 
