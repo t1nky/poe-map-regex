@@ -142,3 +142,24 @@ export function filterSubstrings(
 
   return commonSubstringsSet;
 }
+
+export function combineAndFilterSubstrings(
+  commonSubstringsNamesSet: Set<string>,
+  commonSubstringsWordsSet: Set<string>,
+  lowerOtherStringsCommonSet: Set<string>,
+): Set<string> {
+  const combinedSet = new Set<string>();
+
+  // Combine the sets
+  commonSubstringsNamesSet.forEach((substring) => combinedSet.add(substring));
+  commonSubstringsWordsSet.forEach((substring) => combinedSet.add(substring));
+
+  // Filter the combined set
+  combinedSet.forEach((substring) => {
+    if (lowerOtherStringsCommonSet.has(substring)) {
+      combinedSet.delete(substring);
+    }
+  });
+
+  return combinedSet;
+}

@@ -144,13 +144,14 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
 
 <script>
   import {
-    filterSubstrings,
+    combineAndFilterSubstrings,
     findCommonSubstrings,
     findCoveringGroups,
     mapSubstringsToMatches,
     generateCommonSubstringsSet,
   } from '../utils/regex';
-  import mapCombined from '../data/maps_combined.json';
+  import mapWords from '../data/map_words.json';
+  import mapNames from '../data/map_names.json';
   import Alpine from 'alpinejs';
   import mods from '../data/map_mods.json';
 
@@ -198,7 +199,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
         window.history.replaceState(
           {},
           '',
-          paramsString ? `?${paramsString}` : window.location.pathname
+          paramsString ? `?${paramsString}` : window.location.pathname,
         );
       },
       updateRegex() {
@@ -209,27 +210,39 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
         }
 
         const lowerSubsetArray = (this.uber ? this.subsetArray.uber : this.subsetArray.normal).map(
-          (s) => s.toLowerCase().replaceAll('|', '\n')
+          (s) => s.toLowerCase().replaceAll('|', '\n'),
         );
         const lowerFullArray = (this.uber ? mods.uber : mods.normal).map((s) =>
-          s.toLowerCase().replaceAll('|', '\n')
+          s.toLowerCase().replaceAll('|', '\n'),
         );
 
         const lowerSubsetSet = new Set(lowerSubsetArray);
         const lowerOtherStringsCommonSet = generateCommonSubstringsSet(
           lowerFullArray.filter((item) => !lowerSubsetSet.has(item)),
           2,
-          18
+          18,
         );
 
-        const commonSubstringsSet = findCommonSubstrings(
-          this.uber ? this.subsetArray.uber : this.subsetArray.normal,
-          lowerOtherStringsCommonSet,
-          this.uber ? mapCombined.uber : mapCombined.normal
+        const commonSubstringsNamesSet = new Set(
+          findCommonSubstrings(
+            this.uber ? this.subsetArray.uber : this.subsetArray.normal,
+            lowerOtherStringsCommonSet,
+            this.uber ? mapNames.uber : mapNames.normal,
+          ),
         );
-        const filteredSubstrings = filterSubstrings(
-          commonSubstringsSet,
-          lowerOtherStringsCommonSet
+
+        const commonSubstringsWordsSet = new Set(
+          findCommonSubstrings(
+            this.uber ? this.subsetArray.uber : this.subsetArray.normal,
+            lowerOtherStringsCommonSet,
+            this.uber ? mapWords.uber : mapWords.normal,
+          ),
+        );
+
+        const filteredSubstrings = combineAndFilterSubstrings(
+          commonSubstringsNamesSet,
+          commonSubstringsWordsSet,
+          lowerOtherStringsCommonSet,
         );
         const substringMatchMap = mapSubstringsToMatches(filteredSubstrings, lowerSubsetArray);
         const allCoveringGroups = findCoveringGroups(substringMatchMap, lowerSubsetArray);
@@ -260,7 +273,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
           }
         } else {
           const index = (uberValue ? this.subsetArray.uber : this.subsetArray.normal).indexOf(
-            itemValue
+            itemValue,
           );
           if (index > -1) {
             if (uberValue) {
@@ -281,7 +294,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
           this.subsetArray.normal.length = 0;
         }
         const buttons = document.querySelectorAll(
-          `#map-mod-row[data-uber="${this.uber ? 'uber' : 'normal'}"]`
+          `#map-mod-row[data-uber="${this.uber ? 'uber' : 'normal'}"]`,
         );
         buttons.forEach((button) => {
           button.setAttribute('data-selected', 'false');
@@ -294,7 +307,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
 
         searchParams.getAll('selectedUber').forEach((item) => {
           const listItem = document.querySelector(
-            `#map-mod-row[data-value="${item.replaceAll('\n', '|')}"][data-uber="uber"]`
+            `#map-mod-row[data-value="${item.replaceAll('\n', '|')}"][data-uber="uber"]`,
           );
           if (!(listItem instanceof HTMLElement)) {
             console.log('Item not found');
@@ -305,7 +318,7 @@ import ThemeSwitch from '../components/ThemeSwitch.astro';
         });
         searchParams.getAll('selectedNormal').forEach((item) => {
           const listItem = document.querySelector(
-            `#map-mod-row[data-value="${item.replaceAll('\n', '|')}"][data-uber="normal"]`
+            `#map-mod-row[data-value="${item.replaceAll('\n', '|')}"][data-uber="normal"]`,
           );
           if (!(listItem instanceof HTMLElement)) {
             console.log('Item not found');
